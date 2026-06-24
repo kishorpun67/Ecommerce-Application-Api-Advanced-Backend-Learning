@@ -7,13 +7,13 @@ type ApiErrorDetail = {
 }
 
 
-class ApiError extends Error {
+export class ApiError extends Error {
     public statusCode: number
     public errors:ApiErrorDetail[]
     public isOperational : boolean
     constructor(
-        message:string,
         statusCode:HttpStatusCode,
+        message:string,
         errors : ApiErrorDetail[] = [],
         stack? :string
     )

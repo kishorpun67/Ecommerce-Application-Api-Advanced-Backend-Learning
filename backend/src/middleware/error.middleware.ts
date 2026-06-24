@@ -36,7 +36,7 @@ export const globalErrorHandler = (
 
     return res.status(500).json({
         success: false,
-        message: "something went wrong"
+        message: "something went wrong" + error.message
     })
 
 }

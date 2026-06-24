@@ -12,11 +12,19 @@ app.use(cors({
     credentials:true
 }))
 app.use(cookieParser())
-app.get('/health-check', (req,res)=>{
-    res.status(200).json(
-        {data:app}
-    )
-})
+// app.get("/health-check", (req,res)=>{
+//     res.status(200).json(
+//         {data:app}
+//     )
+// })
+
+import authRouter from "./modules/auth/auth.route.js"
+
+
+app.use("/api/v1/auth", authRouter)
+
+
+
 app.use(globalErrorHandler)
 
 
