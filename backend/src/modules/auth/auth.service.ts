@@ -1,9 +1,10 @@
+import { jwt } from "zod";
 import { JWTPayload } from "../../types";
 import { ApiError } from "../../utils/apiError";
 import { comparePassword, hashPassword, hashRefreshToken } from "../../utils/helpers/auth.helper";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/helpers/jwt.helper";
 import { IAuthRepository } from "./auth.interface";
-import { toUserResponse } from "./auth.mapper";
+import { toJWTPayload, toUserResponse } from "./auth.mapper";
 import { loginUserDTO, registerUserDTO } from "./auth.schema";
 
 
@@ -30,6 +31,9 @@ export  class AuthService {
             ...data, 
             password
         })
+        if(!user) {
+            throw new ApiError(401, "User create faild")
+        }
         return {user:toUserResponse(user)}
         
     }
@@ -44,8 +48,8 @@ export  class AuthService {
             throw new ApiError(409, "Invalid email or password")
         }
 
-        const accessToken = generateAccessToken(user.id)
-        const refreshToken = generateRefreshToken(user.id)
+        const accessToken = generateAccessToken(toJWTPayload(user))
+        const refreshToken = generateRefreshToken(toJWTPayload(user))
         
         const hashRefToken = hashRefreshToken(refreshToken) 
         await this.repo.createRefreshToken({
@@ -75,14 +79,21 @@ export  class AuthService {
         const hashedToken = hashRefreshToken(token)
         const existingToken  = await this.repo.getRefreshTokenByToken(hashedToken)
         // return decoded;
+
         if(!existingToken) {
             throw new ApiError(403, 'Refresh token not found')
         }
 
+        const user = await this.repo.findUserById(decoded.userId)
+        
+        if(!user) {
+            throw new ApiError(401, 'User not found')
+        }
+
         await this.repo.deleteRefreshToken(existingToken.id)
 
-        const newAccessToken = generateAccessToken(decoded.userId)
-        const newRefreshToken = generateRefreshToken(decoded.userId)
+        const newAccessToken = generateAccessToken(toJWTPayload(user))
+        const newRefreshToken = generateRefreshToken(toJWTPayload(user))
 
         const  newRefreshHashToken = hashRefreshToken(newRefreshToken);
         await this.repo.createRefreshToken({
@@ -110,7 +121,9 @@ export  class AuthService {
         if(!refreshToken) {
             throw new ApiError(401, 'Refresh token required')
         }
-        const decoded = verifyRefreshToken(refreshToken) as JWTPayload;       
+        const decoded = verifyRefreshToken(refreshToken)
+        
+        
         const hashedToken = hashRefreshToken(refreshToken);       
         const existingToken = await this.repo.getRefreshTokenByToken(hashedToken)
         if(!existingToken) {

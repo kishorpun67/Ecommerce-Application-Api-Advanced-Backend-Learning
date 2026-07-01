@@ -8,4 +8,6 @@ export type ApiReponse<T> = {
 
 export interface JWTPayload {
     userId:string
+    role: "USER" | "SELLER" | "ADMIN";
+
 }

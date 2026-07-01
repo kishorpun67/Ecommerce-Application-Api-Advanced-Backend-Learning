@@ -11,17 +11,17 @@ const REFRESH_TOKEN_SECRET = JWT_REFRESH_TOKEN_SECRET
 const REFRESH_TOKEN_EXPIRY= JWT_REFRESH_TOKEN_EXPIRY as SignOptions["expiresIn"]
 
 
-export const generateAccessToken = (userId:string):string=> {
+export const generateAccessToken = (user:JWTPayload): string=> {
     return jwt.sign(
-        {userId},
+        user,
         ACCESS_TOKEN_SECRET,
         {expiresIn:ACCESS_TOKEN_EXPIRY}
     )
 }
 
-export const generateRefreshToken = (userId:string):string=> {
+export const generateRefreshToken = (user:JWTPayload): string=> {
     return jwt.sign(
-        {userId},
+        user,
         REFRESH_TOKEN_SECRET,
         {expiresIn:REFRESH_TOKEN_EXPIRY}
     )
@@ -39,7 +39,7 @@ export const verifyAccessToken =  (token:string):JWTPayload =>{
     }
 }
 
-export const verifyRefreshToken =  (token:string):JWTPayload =>{
+export const verifyRefreshToken = (token:string):JWTPayload =>{
     try{
         return  jwt.verify(token, REFRESH_TOKEN_SECRET) as JWTPayload;
     } catch(error) {

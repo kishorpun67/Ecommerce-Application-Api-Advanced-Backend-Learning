@@ -7,7 +7,7 @@ export const registerUserSchema = z.object({
     username: z.string().min(3, "User name must be al lest 3 charaters"),
     email: z.email(),
     password: z.string().min(6,"Password must be at lest 6 characters long"),
-    role: z.enum(["USER","MODERATOR","ADMIN"]).optional(),
+    role: z.enum(["USER","SELLER","ADMIN"]).optional(),
     phoneNumber: z.string()
                     .min(6,"Phone number must be at 6 charaters long")
                     .max(12, "Phone number must be less than 12 charters")
@@ -20,7 +20,7 @@ export const UserResponseSchema = z.object({
     username: z.string(),
     email: z.string().email(),
     phoneNumber: z.string(),
-    role: z.enum(["USER", "MODERATOR", "ADMIN"]),
+    role: z.enum(["USER", "SELLER", "ADMIN"]),
     createdAt: z.date(),
 });
 
